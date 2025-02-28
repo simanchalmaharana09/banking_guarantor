@@ -23,7 +23,7 @@ from Utils import *
 logger = get_logger()
 
 
-def calculate_guarantor_amount(trn_path, rec_registry_path, exg_rate_path):
+def calculate_guarantor_amount(trn_path, rec_registry_path, exg_rate_path, output_path):
     try:
         # Creating a Spark session
         create_spark_session()
@@ -131,6 +131,9 @@ def calculate_guarantor_amount(trn_path, rec_registry_path, exg_rate_path):
             .drop("amount_computed", "row_num")
         logger.info("==== Final output is printing ====")
         final_outcome.show(20, False)
+
+        logger.info(f"Writting dataframe to location - {output_path}")
+        # final_outcome.write.csv(output_path, header=True, mode="overwrite")
     except Exception as e:
         logger.error(f"Error occurred - {e}")
         raise e
@@ -141,8 +144,9 @@ def main():
     trn_path = create_dataset_path(get_property_value("trn_path"))
     exg_rate_path = create_dataset_path(get_property_value("exg_rate_path"))
     rec_registry_path = create_dataset_path(get_property_value("rec_registry_path"))
-
-    calculate_guarantor_amount(trn_path=trn_path, exg_rate_path=exg_rate_path, rec_registry_path=rec_registry_path)
+    output_path = create_dataset_path(get_property_value("output_path"))
+    calculate_guarantor_amount(trn_path=trn_path, exg_rate_path=exg_rate_path, rec_registry_path=rec_registry_path,
+                               output_path=output_path)
 
 
 if __name__ == '__main__':
